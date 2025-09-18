@@ -182,3 +182,61 @@
 2025-09-18 21:02:17,356 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
 2025-09-18 21:02:17,673 - app - INFO - 正在启动FastAPI应用...
 2025-09-18 21:02:17,673 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 21:02:34,075 - train - INFO - Preparing training data...
+2025-09-18 21:02:34,075 - model_utils - INFO - Loading tokenizer from Qwen/Qwen3-0.6B
+2025-09-18 21:02:34,075 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 21:02:35,151 - model_utils - INFO - Set unk_token to <unk>
+2025-09-18 21:02:35,151 - model_utils - INFO - Tokenizer配置完成:
+2025-09-18 21:02:35,151 - model_utils - INFO -   - 词汇表大小: 151669
+2025-09-18 21:02:35,151 - model_utils - INFO -   - pad_token: <|endoftext|>
+2025-09-18 21:02:35,151 - model_utils - INFO -   - eos_token: <|im_end|>
+2025-09-18 21:02:35,151 - model_utils - INFO -   - unk_token: <unk>
+2025-09-18 21:02:35,151 - model_utils - INFO -   - unk_token_id: 128244
+2025-09-18 21:02:35,152 - train - INFO - Tokenizer配置:
+2025-09-18 21:02:35,152 - train - INFO -   - 词汇表大小: 151669
+2025-09-18 21:02:35,152 - train - INFO -   - pad_token: <|endoftext|>
+2025-09-18 21:02:35,153 - train - INFO -   - eos_token: <|im_end|>
+2025-09-18 21:02:35,153 - train - INFO -   - unk_token: <unk>
+2025-09-18 21:02:35,154 - data_processor - INFO - Loaded 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 21:02:35,156 - data_processor - INFO - Processed 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 21:02:37,334 - data_processor - INFO - Training dataset: 1674 samples
+2025-09-18 21:02:37,334 - data_processor - INFO - Loaded 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 21:02:37,335 - data_processor - INFO - Processed 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 21:02:39,095 - data_processor - INFO - Validation dataset: 207 samples
+2025-09-18 21:02:39,096 - data_processor - INFO - Loaded 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 21:02:39,096 - data_processor - INFO - Processed 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 21:02:40,861 - data_processor - INFO - Test dataset: 213 samples
+2025-09-18 21:02:40,861 - train - INFO - Setting up model...
+2025-09-18 21:02:40,861 - model_utils - INFO - Loading model from Qwen/Qwen3-0.6B
+2025-09-18 21:02:41,408 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 21:02:43,055 - model_utils - INFO - Model loaded successfully
+2025-09-18 21:02:43,056 - train - INFO - 模型词汇表大小: 151936
+2025-09-18 21:02:43,056 - train - INFO - Tokenizer词汇表大小: 151669
+2025-09-18 21:02:43,056 - train - WARNING - 词汇表大小不匹配，但不调整模型大小
+2025-09-18 21:02:43,056 - train - WARNING - 未知词汇将使用 unk_token: <unk>
+2025-09-18 21:02:43,056 - model_utils - INFO - Setting up PEFT model with LoRA
+2025-09-18 21:02:43,364 - app - INFO - Tokenizer vocab size: 151669
+2025-09-18 21:02:43,364 - app - INFO - Using unk_token: <unk>
+2025-09-18 21:02:43,374 - model_utils - INFO - Model parameters: 385,941,504
+2025-09-18 21:02:43,374 - model_utils - INFO - Parameter memory: 842.25 MB
+2025-09-18 21:02:43,374 - model_utils - INFO - Buffer memory: 0.00 MB
+2025-09-18 21:02:43,374 - model_utils - INFO - Total memory: 842.25 MB
+2025-09-18 21:02:43,433 - app - INFO - Saving initial model state...
+2025-09-18 21:02:44,674 - app - INFO - Starting training...
+2025-09-18 21:04:50,857 - app - INFO - Saving final model...
+2025-09-18 21:04:52,760 - app - INFO - Training completed successfully!
+2025-09-18 21:05:02,315 - app - INFO - 正在加载模型: final_model
+2025-09-18 21:05:02,316 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 21:05:02,316 - inference - INFO - Trying to load tokenizer from ./outputs\final_model
+2025-09-18 21:05:02,462 - inference - INFO - Successfully loaded tokenizer from ./outputs\final_model
+2025-09-18 21:05:02,462 - inference - INFO - Tokenizer vocab size: 151669
+2025-09-18 21:05:02,462 - inference - INFO - Tokenizer unk_token: <unk>
+2025-09-18 21:05:02,462 - inference - INFO - Loading base model: Qwen/Qwen3-0.6B
+2025-09-18 21:05:03,165 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 21:05:04,574 - inference - INFO - Base model vocab size: 151936
+2025-09-18 21:05:04,575 - inference - WARNING - Tokenizer vocab size (151669) != model vocab size (151936)
+2025-09-18 21:05:04,575 - inference - WARNING - This may cause issues. Consider using the original tokenizer.
+2025-09-18 21:05:04,575 - inference - WARNING - Unknown tokens will be handled by unk_token if available.
+2025-09-18 21:05:04,575 - inference - INFO - Loading PEFT weights from ./outputs\final_model
+2025-09-18 21:05:04,877 - inference - INFO - PEFT model loaded successfully
+2025-09-18 21:05:04,882 - inference - INFO - Model loaded successfully
