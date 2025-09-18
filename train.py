@@ -35,6 +35,25 @@ class QLoRATrainer:
         # 加载tokenizer
         tokenizer = self.model_utils.load_tokenizer()
         
+        # 确保tokenizer有unk_token，并且不调整词汇表大小
+        if tokenizer.unk_token is None:
+            logger.warning("Tokenizer没有unk_token，设置为[UNK]")
+            # 如果没有unk_token，尝试添加一个
+            if "[UNK]" in tokenizer.get_vocab():
+                tokenizer.unk_token = "[UNK]"
+            elif "<unk>" in tokenizer.get_vocab():
+                tokenizer.unk_token = "<unk>"
+            else:
+                # 使用已有的特殊token作为unk_token
+                tokenizer.unk_token = tokenizer.eos_token
+                logger.warning(f"使用 {tokenizer.eos_token} 作为 unk_token")
+        
+        logger.info(f"Tokenizer配置:")
+        logger.info(f"  - 词汇表大小: {len(tokenizer)}")
+        logger.info(f"  - pad_token: {tokenizer.pad_token}")
+        logger.info(f"  - eos_token: {tokenizer.eos_token}")
+        logger.info(f"  - unk_token: {tokenizer.unk_token}")
+        
         # 创建数据处理器
         data_processor = LCCCDataProcessor(tokenizer, self.config.max_seq_length)
         
@@ -55,10 +74,18 @@ class QLoRATrainer:
         # 加载模型
         model = self.model_utils.load_model()
         
-        # 调整embedding大小（如果需要）
-        if len(tokenizer) != model.get_input_embeddings().num_embeddings:
-            model.resize_token_embeddings(len(tokenizer))
-            logger.info(f"Resized token embeddings to {len(tokenizer)}")
+        # 不调整embedding大小，保持原始词汇表大小
+        original_vocab_size = model.get_input_embeddings().num_embeddings
+        tokenizer_vocab_size = len(tokenizer)
+        
+        logger.info(f"模型词汇表大小: {original_vocab_size}")
+        logger.info(f"Tokenizer词汇表大小: {tokenizer_vocab_size}")
+        
+        if tokenizer_vocab_size != original_vocab_size:
+            logger.warning(f"词汇表大小不匹配，但不调整模型大小")
+            logger.warning(f"未知词汇将使用 unk_token: {tokenizer.unk_token}")
+        else:
+            logger.info("词汇表大小匹配，无需调整")
         
         # 设置PEFT
         model = self.model_utils.setup_peft_model(model)

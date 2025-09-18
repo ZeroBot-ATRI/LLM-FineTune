@@ -7,6 +7,8 @@ import asyncio
 import json
 import logging
 import os
+import sys
+import threading
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 from pathlib import Path
@@ -22,6 +24,7 @@ from config import TrainingConfig
 from inference import ChatBot
 from model_utils import ModelUtils
 from data_processor import LCCCDataProcessor
+from train import QLoRATrainer
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -78,6 +81,189 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+# 实际训练函数
+async def run_actual_training(manager: ConnectionManager):
+    """运行实际的训练过程"""
+    try:
+        # 创建训练器
+        trainer = QLoRATrainer(config)
+        
+        def training_callback(step, total_steps, loss, lr=None):
+            """训练回调函数，用于更新状态"""
+            training_status["current_step"] = step
+            training_status["total_steps"] = total_steps
+            training_status["loss"] = loss
+            
+            # 在asyncio事件循环中广播消息
+            asyncio.create_task(manager.broadcast({
+                "type": "training_progress",
+                "step": step,
+                "total_steps": total_steps,
+                "loss": loss,
+                "learning_rate": lr,
+                "timestamp": datetime.now().isoformat()
+            }))
+        
+        # 在线程中运行训练（避免阻塞主线程）
+        def run_training():
+            try:
+                # 准备数据
+                tokenizer, datasets = trainer.prepare_data()
+                
+                # 获取总步数
+                train_dataset = datasets.get('train')
+                total_steps = 1000  # 默认值
+                if train_dataset:
+                    total_samples = len(train_dataset)
+                    batch_size = config.per_device_train_batch_size * config.gradient_accumulation_steps
+                    steps_per_epoch = max(1, total_samples // batch_size)
+                    total_steps = steps_per_epoch * config.num_train_epochs
+                    training_status["total_steps"] = total_steps
+                
+                # 设置模型
+                model = trainer.setup_model(tokenizer)
+                
+                # 记录词汇表信息
+                logger.info(f"Tokenizer vocab size: {len(tokenizer)}")
+                if hasattr(tokenizer, 'unk_token') and tokenizer.unk_token:
+                    logger.info(f"Using unk_token: {tokenizer.unk_token}")
+                
+                # 获取内存占用信息
+                trainer.model_utils.get_model_memory_footprint(model)
+                
+                # 创建训练参数
+                training_args = trainer.model_utils.create_training_arguments()
+                
+                # 创建数据收集器
+                from transformers import Trainer, DataCollatorForLanguageModeling
+                
+                data_collator = DataCollatorForLanguageModeling(
+                    tokenizer=tokenizer,
+                    mlm=False,
+                    pad_to_multiple_of=8,
+                    return_tensors="pt",
+                )
+                
+                # 创建训练器
+                eval_dataset = datasets.get('eval')
+                if eval_dataset is None:
+                    logger.warning("No evaluation dataset found, disabling evaluation")
+                    # 重新创建训练参数，禁用评估
+                    config.eval_strategy = 'no'
+                    training_args = trainer.model_utils.create_training_arguments()
+                
+                custom_trainer = Trainer(
+                    model=model,
+                    args=training_args,
+                    train_dataset=datasets.get('train'),
+                    eval_dataset=eval_dataset,
+                    processing_class=tokenizer,
+                    data_collator=data_collator,
+                )
+                
+                # 保存训练前的模型状态
+                logger.info("Saving initial model state...")
+                initial_model_path = os.path.join(config.output_dir, "initial_model")
+                os.makedirs(initial_model_path, exist_ok=True)
+                custom_trainer.save_model(initial_model_path)
+                
+                # 开始训练
+                logger.info("Starting training...")
+                
+                # 使用简单的进度跟踪
+                class ProgressCallback:
+                    def __init__(self, total_steps, manager):
+                        self.total_steps = total_steps
+                        self.current_step = 0
+                        self.manager = manager
+                        self.last_log_step = 0
+                    
+                    def on_step_end(self, trainer, logs=None):
+                        self.current_step = trainer.state.global_step
+                        
+                        # 每10步或者在有loss的时候更新
+                        if (self.current_step - self.last_log_step >= 10) or (logs and 'loss' in logs):
+                            if logs and 'loss' in logs:
+                                loss = logs['loss']
+                                lr = logs.get('learning_rate', 0)
+                                training_callback(self.current_step, self.total_steps, loss, lr)
+                                self.last_log_step = self.current_step
+                            else:
+                                # 即使没有loss，也更新步数
+                                training_status["current_step"] = self.current_step
+                                asyncio.create_task(self.manager.broadcast({
+                                    "type": "training_progress",
+                                    "step": self.current_step,
+                                    "total_steps": self.total_steps,
+                                    "timestamp": datetime.now().isoformat()
+                                }))
+                                self.last_log_step = self.current_step
+                
+                # 添加回调
+                progress_callback = ProgressCallback(total_steps, manager)
+                
+                # 开始训练
+                custom_trainer.train()
+                
+                # 保存最终模型
+                logger.info("Saving final model...")
+                final_model_path = os.path.join(config.output_dir, "final_model")
+                os.makedirs(final_model_path, exist_ok=True)
+                custom_trainer.save_model(final_model_path)
+                
+                # 保存tokenizer
+                tokenizer.save_pretrained(final_model_path)
+                
+                logger.info("Training completed successfully!")
+                
+                # 更新训练状态为完成
+                if training_status["is_training"]:
+                    training_status.update({
+                        "is_training": False,
+                        "status": "completed"
+                    })
+                    
+                    # 广播训练完成消息
+                    asyncio.create_task(manager.broadcast({
+                        "type": "training_completed",
+                        "timestamp": datetime.now().isoformat()
+                    }))
+                    
+                    # 训练完成后重新加载模型
+                    asyncio.create_task(load_model())
+                    
+            except Exception as e:
+                logger.error(f"Training failed: {str(e)}")
+                training_status.update({
+                    "is_training": False,
+                    "status": "error"
+                })
+                
+                # 广播错误消息
+                asyncio.create_task(manager.broadcast({
+                    "type": "training_error",
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat()
+                }))
+        
+        # 在后台线程中运行训练
+        training_thread = threading.Thread(target=run_training)
+        training_thread.daemon = True
+        training_thread.start()
+        
+    except Exception as e:
+        logger.error(f"Failed to start training: {str(e)}")
+        training_status.update({
+            "is_training": False,
+            "status": "error"
+        })
+        
+        await manager.broadcast({
+            "type": "training_error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        })
+
 # Pydantic模型
 class ChatMessage(BaseModel):
     message: str
@@ -130,6 +316,36 @@ async def load_model():
 async def root():
     """根路径，返回前端页面"""
     return FileResponse("web/index.html")
+
+@app.get("/api/system/info")
+async def get_system_info():
+    """获取系统信息"""
+    import torch
+    import psutil
+    
+    system_info = {
+        "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "torch_version": torch.__version__,
+        "cuda_available": torch.cuda.is_available(),
+        "device_count": torch.cuda.device_count() if torch.cuda.is_available() else 0,
+        "current_device": torch.cuda.current_device() if torch.cuda.is_available() else None,
+        "memory": {
+            "total_ram_gb": round(psutil.virtual_memory().total / (1024**3), 2),
+            "available_ram_gb": round(psutil.virtual_memory().available / (1024**3), 2),
+            "used_ram_percent": psutil.virtual_memory().percent
+        }
+    }
+    
+    if torch.cuda.is_available():
+        try:
+            gpu_memory = torch.cuda.get_device_properties(0).total_memory
+            system_info["gpu_memory_gb"] = round(gpu_memory / (1024**3), 2)
+            system_info["gpu_name"] = torch.cuda.get_device_name(0)
+        except:
+            system_info["gpu_memory_gb"] = "unknown"
+            system_info["gpu_name"] = "unknown"
+    
+    return system_info
 
 @app.get("/api/health")
 async def health_check():
@@ -227,6 +443,52 @@ async def load_specific_model(model_name: str):
         logger.error(f"模型加载失败: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/training/config")
+async def get_training_config():
+    """获取当前训练配置"""
+    return {
+        "model_name": config.model_name,
+        "epochs": config.num_train_epochs,
+        "batch_size": config.per_device_train_batch_size,
+        "learning_rate": config.learning_rate,
+        "max_seq_length": config.max_seq_length,
+        "lora_r": config.lora_r,
+        "lora_alpha": config.lora_alpha,
+        "lora_dropout": config.lora_dropout,
+        "output_dir": config.output_dir,
+        "data_path": config.data_path
+    }
+
+@app.post("/api/training/config")
+async def update_training_config(request: dict):
+    """更新训练配置"""
+    if training_status["is_training"]:
+        raise HTTPException(status_code=400, detail="训练进行中，不能修改配置")
+    
+    # 更新允许的配置项
+    allowed_configs = {
+        'num_train_epochs': int,
+        'per_device_train_batch_size': int,
+        'learning_rate': float,
+        'max_seq_length': int,
+        'lora_r': int,
+        'lora_alpha': int,
+        'lora_dropout': float
+    }
+    
+    updated = {}
+    for key, value in request.items():
+        if key in allowed_configs:
+            try:
+                # 类型转换
+                converted_value = allowed_configs[key](value)
+                setattr(config, key, converted_value)
+                updated[key] = converted_value
+            except (ValueError, TypeError) as e:
+                raise HTTPException(status_code=400, detail=f"配置项 {key} 的值无效: {str(e)}")
+    
+    return {"status": "success", "updated": updated}
+
 @app.get("/api/training/status")
 async def get_training_status():
     """获取训练状态"""
@@ -238,10 +500,29 @@ async def start_training(request: TrainingRequest, background_tasks: BackgroundT
     if training_status["is_training"]:
         raise HTTPException(status_code=400, detail="训练已在进行中")
     
+    # 更新训练配置
+    if request.epochs:
+        config.num_train_epochs = request.epochs
+    if request.batch_size:
+        config.per_device_train_batch_size = request.batch_size
+    if request.learning_rate:
+        config.learning_rate = request.learning_rate
+        
+    # 确保输出目录存在
+    os.makedirs(config.output_dir, exist_ok=True)
+    
     # 在后台启动训练任务
     background_tasks.add_task(run_training, request)
     
-    return {"status": "success", "message": "训练已开始"}
+    return {
+        "status": "success", 
+        "message": "训练已开始",
+        "config": {
+            "epochs": config.num_train_epochs,
+            "batch_size": config.per_device_train_batch_size,
+            "learning_rate": config.learning_rate
+        }
+    }
 
 @app.post("/api/training/stop")
 async def stop_training():
@@ -274,38 +555,37 @@ async def run_training(request: TrainingRequest):
     global training_status
     
     try:
+        # 更新配置（如果提供了参数）
+        if request.epochs and request.epochs != config.num_train_epochs:
+            config.num_train_epochs = request.epochs
+            logger.info(f"Updated epochs to {request.epochs}")
+        if request.batch_size and request.batch_size != config.per_device_train_batch_size:
+            config.per_device_train_batch_size = request.batch_size
+            logger.info(f"Updated batch size to {request.batch_size}")
+        if request.learning_rate and request.learning_rate != config.learning_rate:
+            config.learning_rate = request.learning_rate
+            logger.info(f"Updated learning rate to {request.learning_rate}")
+        
         training_status.update({
             "is_training": True,
             "current_step": 0,
-            "total_steps": 630,  # 根据实际配置计算
-            "status": "training"
+            "total_steps": 0,
+            "loss": 0.0,
+            "status": "starting"
         })
         
         await manager.broadcast({
             "type": "training_started",
+            "config": {
+                "epochs": config.num_train_epochs,
+                "batch_size": config.per_device_train_batch_size,
+                "learning_rate": config.learning_rate
+            },
             "timestamp": datetime.now().isoformat()
         })
         
-        # 这里应该调用实际的训练代码
-        # 由于训练是长时间运行的任务，这里模拟训练过程
-        for step in range(1, 631):
-            if not training_status["is_training"]:
-                break
-                
-            training_status["current_step"] = step
-            training_status["loss"] = 2.0 - (step / 630) * 1.5  # 模拟损失下降
-            
-            # 每10步广播一次状态
-            if step % 10 == 0:
-                await manager.broadcast({
-                    "type": "training_progress",
-                    "step": step,
-                    "total_steps": 630,
-                    "loss": training_status["loss"],
-                    "timestamp": datetime.now().isoformat()
-                })
-            
-            await asyncio.sleep(0.1)  # 模拟训练时间
+        # 调用实际的训练代码
+        await run_actual_training(manager)
         
         if training_status["is_training"]:
             training_status.update({

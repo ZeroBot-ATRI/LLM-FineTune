@@ -25,21 +25,45 @@ class ChatBot:
         """加载模型和tokenizer"""
         logger.info(f"Loading model from {self.model_path}")
         
-        # 加载tokenizer，使用基础模型的tokenizer
-        config = TrainingConfig()
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            config.model_name,  # 使用基础模型的tokenizer
-            trust_remote_code=True,
-            use_fast=False
-        )
+        # 首先尝试从训练输出目录加载tokenizer
+        tokenizer_loaded = False
+        try:
+            logger.info(f"Trying to load tokenizer from {self.model_path}")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.model_path,  # 使用训练后保存的tokenizer
+                trust_remote_code=True,
+                use_fast=False
+            )
+            tokenizer_loaded = True
+            logger.info(f"Successfully loaded tokenizer from {self.model_path}")
+        except Exception as e:
+            logger.warning(f"Failed to load tokenizer from {self.model_path}: {e}")
+            logger.info("Falling back to base model tokenizer")
         
+        # 如果从训练目录加载失败，使用基础模型的tokenizer
+        if not tokenizer_loaded:
+            config = TrainingConfig()
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                config.model_name,
+                trust_remote_code=True,
+                use_fast=False
+            )
+        
+        # 确保tokenizer已加载
+        if self.tokenizer is None:
+            raise RuntimeError("Failed to load tokenizer")
+            
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        logger.info(f"Tokenizer vocab size: {len(self.tokenizer)}")
+        logger.info(f"Tokenizer unk_token: {getattr(self.tokenizer, 'unk_token', 'None')}")
         
         # 加载基础模型
         if self.use_peft:
             # 从配置获取基础模型路径
             config = TrainingConfig()
+            logger.info(f"Loading base model: {config.model_name}")
             base_model = AutoModelForCausalLM.from_pretrained(
                 config.model_name,
                 torch_dtype=torch.float16,
@@ -47,8 +71,24 @@ class ChatBot:
                 trust_remote_code=True
             )
             
+            # 不调整基础模型的embedding大小，保持原始词汇表大小
+            original_vocab_size = base_model.get_input_embeddings().num_embeddings
+            logger.info(f"Base model vocab size: {original_vocab_size}")
+            
+            if len(self.tokenizer) != original_vocab_size:
+                logger.warning(f"Tokenizer vocab size ({len(self.tokenizer)}) != model vocab size ({original_vocab_size})")
+                logger.warning("This may cause issues. Consider using the original tokenizer.")
+                logger.warning("Unknown tokens will be handled by unk_token if available.")
+            
             # 加载PEFT权重
-            self.model = PeftModel.from_pretrained(base_model, self.model_path)
+            logger.info(f"Loading PEFT weights from {self.model_path}")
+            try:
+                self.model = PeftModel.from_pretrained(base_model, self.model_path)
+                logger.info("PEFT model loaded successfully")
+            except Exception as e:
+                logger.error(f"Failed to load PEFT model: {e}")
+                logger.info("This might be due to vocab size mismatch. Try retraining with fixed vocab size.")
+                raise
         else:
             # 直接加载合并后的模型
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -58,10 +98,13 @@ class ChatBot:
                 trust_remote_code=True
             )
         
+        if self.model is None:
+            raise RuntimeError("Failed to load model")
+            
         self.model.eval()
         logger.info("Model loaded successfully")
     
-    def format_message(self, user_input: str, history: list = None) -> str:
+    def format_message(self, user_input: str, history = None) -> str:
         """格式化消息为聊天模板"""
         # 手动构建聊天模板，与训练时使用的格式一致
         formatted_text = "<|im_start|>system\n你是一个乐于助人的AI助手。<|im_end|>\n"

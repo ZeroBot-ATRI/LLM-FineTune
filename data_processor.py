@@ -87,14 +87,23 @@ class LCCCDataProcessor:
         Returns:
             分词后的结果
         """
-        # 分词
+        # 分词，确保使用unk_token处理未知词汇
         model_inputs = self.tokenizer(
             examples["text"],
             truncation=True,
             padding=False,  # 不在这里padding，后面用DataCollator
             max_length=self.max_seq_length,
-            return_tensors=None
+            return_tensors=None,
+            # 确保使用unk_token处理未知词汇
+            add_special_tokens=True
         )
+        
+        # 检查是否有unk_token_id出现
+        if hasattr(self.tokenizer, 'unk_token_id') and self.tokenizer.unk_token_id is not None:
+            for i, input_ids in enumerate(model_inputs["input_ids"]):
+                unk_count = input_ids.count(self.tokenizer.unk_token_id)
+                if unk_count > 0:
+                    logger.debug(f"Sample {i}: Found {unk_count} unknown tokens")
         
         # 对于因果语言模型，labels就是input_ids
         # DataCollatorForLanguageModeling会自动处理labels，所以不需要手动设置

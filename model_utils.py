@@ -47,6 +47,26 @@ class ModelUtils:
         # 设置特殊token
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
+        
+        # 确保有unk_token，用于处理未知词汇
+        if tokenizer.unk_token is None:
+            # 检查常见的UNK token
+            vocab = tokenizer.get_vocab()
+            if "<unk>" in vocab:
+                tokenizer.unk_token = "<unk>"
+                logger.info("Set unk_token to <unk>")
+            elif "[UNK]" in vocab:
+                tokenizer.unk_token = "[UNK]"
+                logger.info("Set unk_token to [UNK]")
+            elif "<|endoftext|>" in vocab:
+                tokenizer.unk_token = "<|endoftext|>"
+                logger.info("Set unk_token to <|endoftext|>")
+            else:
+                # 如果都没有，使用eos_token作为unk_token
+                tokenizer.unk_token = tokenizer.eos_token
+                logger.warning(f"No standard unk_token found, using eos_token: {tokenizer.eos_token}")
+        else:
+            logger.info(f"Found existing unk_token: {tokenizer.unk_token}")
             
         # 添加聊天模板（如果需要）
         if not hasattr(tokenizer, 'chat_template') or tokenizer.chat_template is None:
@@ -62,7 +82,13 @@ class ModelUtils:
                 "{% endfor %}"
             )
         
-        logger.info(f"Tokenizer loaded. Vocab size: {len(tokenizer)}")
+        logger.info(f"Tokenizer配置完成:")
+        logger.info(f"  - 词汇表大小: {len(tokenizer)}")
+        logger.info(f"  - pad_token: {tokenizer.pad_token}")
+        logger.info(f"  - eos_token: {tokenizer.eos_token}")
+        logger.info(f"  - unk_token: {tokenizer.unk_token}")
+        logger.info(f"  - unk_token_id: {getattr(tokenizer, 'unk_token_id', 'None')}")
+        
         return tokenizer
     
     def load_model(self):

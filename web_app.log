@@ -51,3 +51,134 @@
 2025-09-18 19:58:42,133 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
 2025-09-18 19:58:45,196 - inference - INFO - Model loaded successfully
 2025-09-18 19:58:45,196 - app - INFO - 模型加载成功！
+2025-09-18 20:34:20,945 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 20:34:38,658 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 20:34:39,549 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 20:34:39,550 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 20:34:40,825 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 20:34:40,826 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:36:58,462 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 20:37:03,679 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 20:37:03,999 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 20:37:03,999 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 20:37:04,359 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 20:37:04,359 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:43:31,172 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 20:43:35,700 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 20:43:35,964 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 20:43:35,966 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 20:43:36,295 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 20:43:36,295 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:43:43,130 - train - INFO - Preparing training data...
+2025-09-18 20:43:43,130 - model_utils - INFO - Loading tokenizer from Qwen/Qwen3-0.6B
+2025-09-18 20:43:43,130 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:43:44,678 - model_utils - INFO - Tokenizer loaded. Vocab size: 151669
+2025-09-18 20:43:44,680 - data_processor - INFO - Loaded 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:43:44,681 - data_processor - INFO - Processed 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:43:46,931 - data_processor - INFO - Training dataset: 1674 samples
+2025-09-18 20:43:46,931 - data_processor - INFO - Loaded 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:43:46,931 - data_processor - INFO - Processed 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:43:48,748 - data_processor - INFO - Validation dataset: 207 samples
+2025-09-18 20:43:48,749 - data_processor - INFO - Loaded 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:43:48,749 - data_processor - INFO - Processed 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:43:50,551 - data_processor - INFO - Test dataset: 213 samples
+2025-09-18 20:43:50,551 - train - INFO - Setting up model...
+2025-09-18 20:43:50,551 - model_utils - INFO - Loading model from Qwen/Qwen3-0.6B
+2025-09-18 20:43:51,122 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 20:43:52,866 - model_utils - INFO - Model loaded successfully
+2025-09-18 20:43:52,877 - train - INFO - Resized token embeddings to 151669
+2025-09-18 20:43:52,877 - model_utils - INFO - Setting up PEFT model with LoRA
+2025-09-18 20:43:53,240 - model_utils - INFO - Model parameters: 385,668,096
+2025-09-18 20:43:53,240 - model_utils - INFO - Parameter memory: 841.21 MB
+2025-09-18 20:43:53,241 - model_utils - INFO - Buffer memory: 0.00 MB
+2025-09-18 20:43:53,241 - model_utils - INFO - Total memory: 841.21 MB
+2025-09-18 20:43:53,347 - app - INFO - Saving initial model state...
+2025-09-18 20:43:55,714 - app - INFO - Starting training...
+2025-09-18 20:44:10,998 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 20:44:15,278 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 20:44:15,525 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 20:44:15,525 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 20:44:15,842 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 20:44:15,842 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:44:28,860 - train - INFO - Preparing training data...
+2025-09-18 20:44:28,861 - model_utils - INFO - Loading tokenizer from Qwen/Qwen3-0.6B
+2025-09-18 20:44:28,861 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:44:30,521 - model_utils - INFO - Tokenizer loaded. Vocab size: 151669
+2025-09-18 20:44:30,523 - data_processor - INFO - Loaded 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:44:30,525 - data_processor - INFO - Processed 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:44:32,681 - data_processor - INFO - Training dataset: 1674 samples
+2025-09-18 20:44:32,682 - data_processor - INFO - Loaded 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:44:32,682 - data_processor - INFO - Processed 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:44:34,477 - data_processor - INFO - Validation dataset: 207 samples
+2025-09-18 20:44:34,478 - data_processor - INFO - Loaded 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:44:34,478 - data_processor - INFO - Processed 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:44:36,340 - data_processor - INFO - Test dataset: 213 samples
+2025-09-18 20:44:36,340 - train - INFO - Setting up model...
+2025-09-18 20:44:36,340 - model_utils - INFO - Loading model from Qwen/Qwen3-0.6B
+2025-09-18 20:44:37,141 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 20:44:39,284 - model_utils - INFO - Model loaded successfully
+2025-09-18 20:44:39,295 - train - INFO - Resized token embeddings to 151669
+2025-09-18 20:44:39,295 - model_utils - INFO - Setting up PEFT model with LoRA
+2025-09-18 20:44:39,684 - model_utils - INFO - Model parameters: 385,668,096
+2025-09-18 20:44:39,684 - model_utils - INFO - Parameter memory: 841.21 MB
+2025-09-18 20:44:39,685 - model_utils - INFO - Buffer memory: 0.00 MB
+2025-09-18 20:44:39,685 - model_utils - INFO - Total memory: 841.21 MB
+2025-09-18 20:44:39,742 - app - INFO - Saving initial model state...
+2025-09-18 20:44:42,221 - app - INFO - Starting training...
+2025-09-18 20:46:36,902 - app - INFO - Saving final model...
+2025-09-18 20:46:39,432 - app - INFO - Training completed successfully!
+2025-09-18 20:47:03,717 - app - INFO - 正在加载模型: final_model
+2025-09-18 20:47:03,718 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 20:47:08,868 - app - ERROR - 模型加载失败: Error(s) in loading state_dict for PeftModelForCausalLM:
+	size mismatch for base_model.model.model.embed_tokens.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+	size mismatch for base_model.model.lm_head.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+2025-09-18 20:47:10,563 - app - INFO - 正在加载模型: final_model
+2025-09-18 20:47:10,563 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 20:47:14,804 - app - ERROR - 模型加载失败: Error(s) in loading state_dict for PeftModelForCausalLM:
+	size mismatch for base_model.model.model.embed_tokens.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+	size mismatch for base_model.model.lm_head.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+2025-09-18 20:47:40,888 - train - INFO - Preparing training data...
+2025-09-18 20:47:40,888 - model_utils - INFO - Loading tokenizer from Qwen/Qwen3-0.6B
+2025-09-18 20:47:40,888 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 20:47:42,128 - model_utils - INFO - Tokenizer loaded. Vocab size: 151669
+2025-09-18 20:47:42,132 - data_processor - INFO - Loaded 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:47:42,134 - data_processor - INFO - Processed 1674 conversations from ./datasets\LCCC-base_train.json
+2025-09-18 20:47:44,524 - data_processor - INFO - Training dataset: 1674 samples
+2025-09-18 20:47:44,524 - data_processor - INFO - Loaded 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:47:44,524 - data_processor - INFO - Processed 207 conversations from ./datasets\LCCC-base_valid.json
+2025-09-18 20:47:46,515 - data_processor - INFO - Validation dataset: 207 samples
+2025-09-18 20:47:46,516 - data_processor - INFO - Loaded 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:47:46,516 - data_processor - INFO - Processed 213 conversations from ./datasets\LCCC-base_test.json
+2025-09-18 20:47:48,461 - data_processor - INFO - Test dataset: 213 samples
+2025-09-18 20:47:48,461 - train - INFO - Setting up model...
+2025-09-18 20:47:48,462 - model_utils - INFO - Loading model from Qwen/Qwen3-0.6B
+2025-09-18 20:47:58,543 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 20:48:00,808 - model_utils - INFO - Model loaded successfully
+2025-09-18 20:48:00,808 - train - INFO - Resized token embeddings to 151669
+2025-09-18 20:48:00,810 - model_utils - INFO - Setting up PEFT model with LoRA
+2025-09-18 20:48:01,280 - model_utils - INFO - Model parameters: 385,668,096
+2025-09-18 20:48:01,280 - model_utils - INFO - Parameter memory: 841.21 MB
+2025-09-18 20:48:01,280 - model_utils - INFO - Buffer memory: 0.00 MB
+2025-09-18 20:48:01,280 - model_utils - INFO - Total memory: 841.21 MB
+2025-09-18 20:48:01,341 - app - INFO - Saving initial model state...
+2025-09-18 20:48:03,578 - app - INFO - Starting training...
+2025-09-18 20:53:57,368 - app - INFO - Saving final model...
+2025-09-18 20:53:59,915 - app - INFO - Training completed successfully!
+2025-09-18 20:54:06,524 - app - INFO - 正在加载模型: final_model
+2025-09-18 20:54:06,525 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 20:54:08,097 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 20:54:10,249 - app - ERROR - 模型加载失败: Error(s) in loading state_dict for PeftModelForCausalLM:
+	size mismatch for base_model.model.model.embed_tokens.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+	size mismatch for base_model.model.lm_head.weight: copying a param with shape torch.Size([151669, 1024]) from checkpoint, the shape in current model is torch.Size([151936, 1024]).
+2025-09-18 21:01:46,046 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 21:01:50,281 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 21:01:50,535 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 21:01:50,536 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 21:01:50,843 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 21:01:50,844 - app - WARNING - 未找到微调后的模型，请先进行训练
+2025-09-18 21:02:12,703 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 21:02:17,100 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 21:02:17,356 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 21:02:17,356 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 21:02:17,673 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 21:02:17,673 - app - WARNING - 未找到微调后的模型，请先进行训练
