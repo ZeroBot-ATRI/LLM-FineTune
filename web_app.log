@@ -41,3 +41,13 @@
 2025-09-18 18:18:57,095 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
 2025-09-18 18:18:58,834 - inference - INFO - Model loaded successfully
 2025-09-18 18:18:58,834 - app - INFO - 模型加载成功！
+2025-09-18 19:58:16,305 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 19:58:35,993 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 19:58:36,999 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 19:58:36,999 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 19:58:38,324 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 19:58:38,324 - app - INFO - 正在加载微调后的模型...
+2025-09-18 19:58:38,324 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 19:58:42,133 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 19:58:45,196 - inference - INFO - Model loaded successfully
+2025-09-18 19:58:45,196 - app - INFO - 模型加载成功！
