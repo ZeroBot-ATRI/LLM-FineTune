@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen3-0.6B LCCC QLoRA 微调项目</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h2>QLoRA Chat</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active" data-tab="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>对话</span>
+                </div>
+                <div class="nav-item" data-tab="training">
+                    <i class="fas fa-cogs"></i>
+                    <span>训练</span>
+                </div>
+                <div class="nav-item" data-tab="models">
+                    <i class="fas fa-brain"></i>
+                    <span>模型管理</span>
+                </div>
+                <div class="nav-item" data-tab="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>日志</span>
+                </div>
+            </nav>
+            
+            <div class="status-panel">
+                <div class="status-item">
+                    <span class="status-label">模型状态:</span>
+                    <span id="model-status" class="status-value">未加载</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">训练状态:</span>
+                    <span id="training-status" class="status-value">空闲</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 对话界面 -->
+            <div id="chat-tab" class="tab-content active">
+                <div class="chat-header">
+                    <h1>智能对话</h1>
+                    <div class="chat-controls">
+                        <button id="clear-chat" class="btn btn-secondary">
+                            <i class="fas fa-trash"></i> 清空对话
+                        </button>
+                        <button id="export-chat" class="btn btn-secondary">
+                            <i class="fas fa-download"></i> 导出对话
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-text">你好！我是基于Qwen3-0.6B微调的中文对话助手。有什么可以帮助你的吗？</div>
+                                <div class="message-time">刚刚</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <div class="generation-settings">
+                            <div class="setting-group">
+                                <label>最大生成长度:</label>
+                                <input type="range" id="max-tokens" min="50" max="500" value="100">
+                                <span id="max-tokens-value">100</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>温度:</label>
+                                <input type="range" id="temperature" min="0.1" max="1.0" step="0.1" value="0.3">
+                                <span id="temperature-value">0.3</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Top-p:</label>
+                                <input type="range" id="top-p" min="0.1" max="1.0" step="0.1" value="0.8">
+                                <span id="top-p-value">0.8</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-container">
+                            <textarea id="chat-input" placeholder="请输入您的消息..."></textarea>
+                            <button id="send-btn" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 训练界面 -->
+            <div id="training-tab" class="tab-content">
+                <div class="training-header">
+                    <h1>模型训练</h1>
+                </div>
+                
+                <div class="training-container">
+                    <div class="training-config">
+                        <h3>训练配置</h3>
+                        <div class="config-group">
+                            <label for="epochs">训练轮次:</label>
+                            <input type="number" id="epochs" min="1" max="10" value="3">
+                        </div>
+                        <div class="config-group">
+                            <label for="batch-size">批量大小:</label>
+                            <input type="number" id="batch-size" min="1" max="8" value="2">
+                        </div>
+                        <div class="config-group">
+                            <label for="learning-rate">学习率:</label>
+                            <input type="number" id="learning-rate" step="0.0001" value="0.0002">
+                        </div>
+                        
+                        <div class="training-buttons">
+                            <button id="start-training" class="btn btn-success">
+                                <i class="fas fa-play"></i> 开始训练
+                            </button>
+                            <button id="stop-training" class="btn btn-danger" disabled>
+                                <i class="fas fa-stop"></i> 停止训练
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="training-progress">
+                        <h3>训练进度</h3>
+                        <div class="progress-info">
+                            <div class="progress-item">
+                                <span>当前步数:</span>
+                                <span id="current-step">0</span>
+                            </div>
+                            <div class="progress-item">
+                                <span>总步数:</span>
+                                <span id="total-steps">0</span>
+                            </div>
+                            <div class="progress-item">
+                                <span>当前损失:</span>
+                                <span id="current-loss">0.000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div id="progress-bar" class="progress-bar"></div>
+                        </div>
+                        
+                        <div id="loss-chart" class="chart-container">
+                            <canvas id="loss-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模型管理界面 -->
+            <div id="models-tab" class="tab-content">
+                <div class="models-header">
+                    <h1>模型管理</h1>
+                    <button id="refresh-models" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> 刷新
+                    </button>
+                </div>
+                
+                <div class="models-container">
+                    <div id="models-list" class="models-list">
+                        <!-- 模型列表将动态加载 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 日志界面 -->
+            <div id="logs-tab" class="tab-content">
+                <div class="logs-header">
+                    <h1>训练日志</h1>
+                    <div class="log-controls">
+                        <button id="refresh-logs" class="btn btn-primary">
+                            <i class="fas fa-sync"></i> 刷新日志
+                        </button>
+                        <button id="clear-logs" class="btn btn-secondary">
+                            <i class="fas fa-trash"></i> 清空显示
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="logs-container">
+                    <div id="logs-content" class="logs-content">
+                        <!-- 日志内容将动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>处理中...</p>
+        </div>
+    </div>
+
+    <!-- 通知弹窗 -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <span id="notification-text"></span>
+            <button id="close-notification" class="close-btn">&times;</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="static/script.js"></script>
+</body>
+</html>

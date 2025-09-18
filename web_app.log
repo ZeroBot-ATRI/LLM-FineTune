@@ -1,0 +1,43 @@
+2025-09-18 14:31:11,751 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 14:31:16,394 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 14:31:17,481 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 14:31:17,482 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 14:31:18,892 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 14:31:18,892 - app - INFO - 正在加载微调后的模型...
+2025-09-18 14:31:18,893 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 14:32:00,239 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 14:32:21,289 - inference - INFO - Model loaded successfully
+2025-09-18 14:32:21,289 - app - INFO - 模型加载成功！
+2025-09-18 14:34:44,843 - app - INFO - 正在加载微调后的模型...
+2025-09-18 14:34:44,843 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 14:35:26,268 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 14:35:58,782 - inference - INFO - Model loaded successfully
+2025-09-18 14:35:58,797 - app - INFO - 模型加载成功！
+2025-09-18 14:35:58,798 - app - INFO - 正在加载模型: initial_model
+2025-09-18 14:35:58,799 - inference - INFO - Loading model from ./outputs\initial_model
+2025-09-18 14:36:51,087 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 14:37:12,305 - inference - INFO - Model loaded successfully
+2025-09-18 14:39:48,934 - app - INFO - 正在加载模型: checkpoint-630
+2025-09-18 14:39:48,934 - inference - INFO - Loading model from ./outputs\checkpoint-630
+2025-09-18 14:40:41,236 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 14:41:02,571 - inference - INFO - Model loaded successfully
+2025-09-18 16:39:32,084 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 16:39:36,820 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 16:39:37,068 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 16:39:37,068 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 16:39:37,366 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 16:39:37,366 - app - INFO - 正在加载微调后的模型...
+2025-09-18 16:39:37,367 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 16:40:40,786 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 16:41:01,803 - inference - INFO - Model loaded successfully
+2025-09-18 16:41:01,803 - app - INFO - 模型加载成功！
+2025-09-18 18:18:47,679 - __main__ - INFO - 正在启动Qwen3-0.6B QLoRA Web应用...
+2025-09-18 18:18:55,846 - __main__ - INFO - 启动Web服务器: http://127.0.0.1:8000
+2025-09-18 18:18:56,287 - numexpr.utils - INFO - Note: NumExpr detected 24 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2025-09-18 18:18:56,287 - numexpr.utils - INFO - NumExpr defaulting to 8 threads.
+2025-09-18 18:18:56,847 - app - INFO - 正在启动FastAPI应用...
+2025-09-18 18:18:56,847 - app - INFO - 正在加载微调后的模型...
+2025-09-18 18:18:56,848 - inference - INFO - Loading model from ./outputs\final_model
+2025-09-18 18:18:57,095 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-18 18:18:58,834 - inference - INFO - Model loaded successfully
+2025-09-18 18:18:58,834 - app - INFO - 模型加载成功！
