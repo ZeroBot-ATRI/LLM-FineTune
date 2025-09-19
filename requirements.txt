@@ -1,36 +1,23 @@
-# 核心依赖
 torch>=2.0.0
 transformers>=4.35.0
 peft>=0.6.0
 bitsandbytes>=0.41.0
 accelerate>=0.24.0
 datasets>=2.14.0
-
-# 训练相关
 trl>=0.7.0
 sentencepiece
 tokenizers
-
-# 数据处理
 pandas
 numpy
 scipy
-
-# 工具和可视化
 tqdm
 matplotlib
 seaborn
 wandb
-
-# JSON处理
 jsonlines
-
-# 评估指标
 evaluate
 rouge-score
 nltk
-
-# Web服务相关
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 websockets>=11.0
